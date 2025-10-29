@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ✅ Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Your existing styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='AdminDashboard/css/general.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='AdminDashboard/css/admindashboard.css') }}">
+    <script src="{{ url_for('static', filename='AdminDashboard/js/admin.js') }}" defer></script>
+
+    <title>Admin Dashboard · Haraya Home</title>
+</head>
+
+<body>
+    <header>
+        <div class="logo ">
+            <img src="{{ url_for('static', filename='LoginSignup/img/Logo-Black.png') }}" alt="HarayaHomes">
+        </div>
+
+
+        <nav class="top-nav ">
+            <a class="notification " href="# " title="Notifications ">
+                <i class="fas fa-bell "></i>
+            </a>
+            <a class="mail " href="# " title="Mail ">
+                <i class="fas fa-envelope "></i>
+            </a>
+            <a class="admin " href="# " title="Admin Settings ">
+                <i class="fas fa-user-cog "></i>
+            </a>
+        </nav>
+    </header>
+
+    <div class="container ">
+        <aside class="sidebar ">
+            <nav class="sidebar-nav ">
+                <a class="dashboard " href="/dashboard ">Dashboard</a>
+                <a class="commisions " href="/commissions ">Commissions</a>
+                <a class="applications " href="/applications ">Applications</a>
+                <a class="users " href="/users ">Users</a>
+                <a class="reports " href="/reports ">Reports</a>
+                <a class="products " href="/products ">Products</a>
+            </nav>
+        </aside>
+
+        <!-- ✅ Main Content Wrapper -->
+        <div class="main-content ">
+            <!-- Summary cards -->
+            <section class="trends card ">
+                <div class="section-header ">
+                    <h3>Trends</h3>
+                    <div class="actions-inline ">
+                        <button class="btn btn-light "><i class="fa-solid fa-download "></i> Export</button>
+                        <button class="btn btn-light "><i class="fa-solid fa-gear "></i></button>
+                    </div>
+                </div>
+                <div class="placeholder-chart ">Chart placeholder</div>
+            </section>
+
+            <section class="total-earned card ">
+                <div class="section-header ">
+                    <h3>Total Earned</h3>
+                    <div class="actions-inline">
+                        <button class="btn btn-outline btn-sm" onclick="admin.filterEarnings('week')">This Week</button>
+                        <button class="btn btn-outline btn-sm" onclick="admin.filterEarnings('month')">This Month</button>
+                    </div>
+                </div>
+                <p class="metric " id="total-earned">₱ 0.00</p>
+                <p class="subtext " id="earnings-period">This week</p>
+            </section>
+
+            <section class="top-products card ">
+                <div class="section-header ">
+                    <h3>Top Products</h3>
+                    <div class="actions-inline">
+                        <button class="btn btn-outline btn-sm" onclick="admin.filterTopProducts('week')">This Week</button>
+                        <button class="btn btn-outline btn-sm" onclick="admin.filterTopProducts('month')">This Month</button>
+                    </div>
+                </div>
+                <table class="table compact " id="top-products-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Seller</th>
+                            <th>Sold</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Loading...</td>
+                            <td>Loading...</td>
+                            <td>Loading...</td>
+                            <td>Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Main table area -->
+            <main class="content card ">
+                <div class="section-header ">
+                    <h3>Best Sellers</h3>
+                    <div class="actions-inline ">
+                        <button class="btn btn-outline " onclick="admin.exportBestSellersPDF()"><i class="fa-solid fa-file-pdf "></i> Export PDF</button>
+                        <button class="btn btn-light " onclick="admin.refreshBestSellers()"><i class="fa-solid fa-rotate "></i></button>
+                    </div>
+                </div>
+
+                <div class="toolbar ">
+                    <input class="input " type="search " placeholder="Search sellers, products... " id="best-sellers-search">
+                    <div class="toolbar-right ">
+                        <select class="input " id="best-sellers-period">
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="all">All Time</option>
+            </select>
+                    </div>
+                </div>
+
+                <table class="table " id="best-sellers-table ">
+                    <thead>
+                        <tr>
+                            <th>Seller ID</th>
+                            <th>Seller Name</th>
+                            <th>Shop Name</th>
+                            <th>Total Products Sold</th>
+                            <th>Total Revenue</th>
+                            <th>Average Rating</th>
+                            <th>Commission Earned</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Loading...</td>
+                            <td>Loading...</td>
+                            <td>Loading...</td>
+                            <td>Loading...</td>
+                            <td>Loading...</td>
+                            <td>Loading...</td>
+                            <td>Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </main>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,242 @@
+/*
+SQLyog Ultimate v10.00 Beta1
+MySQL - 5.5.5-10.4.32-MariaDB : Database - harayahomesdb
+*********************************************************************
+*/
+
+
+/*!40101 SET NAMES utf8 */;
+
+/*!40101 SET SQL_MODE=''*/;
+
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/`harayahomesdb` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
+
+USE `harayahomesdb`;
+
+/*Table structure for table `cart` */
+
+DROP TABLE IF EXISTS `cart`;
+
+CREATE TABLE `cart` (
+  `cart_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`cart_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `cart_items` */
+
+DROP TABLE IF EXISTS `cart_items`;
+
+CREATE TABLE `cart_items` (
+  `cart_item_id` int(11) NOT NULL AUTO_INCREMENT,
+  `cart_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `quantity` int(11) DEFAULT 1,
+  PRIMARY KEY (`cart_item_id`),
+  KEY `cart_id` (`cart_id`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `cart_items_ibfk_1` FOREIGN KEY (`cart_id`) REFERENCES `cart` (`cart_id`),
+  CONSTRAINT `cart_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`Product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `orders` */
+
+DROP TABLE IF EXISTS `orders`;
+
+CREATE TABLE `orders` (
+  `order_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `seller_id` int(11) DEFAULT NULL,
+  `product_id` int(11) NOT NULL,
+  `rider_id` int(255) NOT NULL,
+  `order_date` datetime NOT NULL,
+  `orderstatus` enum('pending','preparing','shipped','received') NOT NULL,
+  `total_amount` float NOT NULL,
+  `payment_status` enum('pending','paid') NOT NULL,
+  `is_refunded` enum('No','Yes') DEFAULT 'No',
+  `refund_date` datetime DEFAULT NULL,
+  `commission_rate` float DEFAULT 5.0,
+  `commission_amount` float DEFAULT 0.0,
+  `commission_status` enum('pending','approved','rejected') DEFAULT 'pending',
+  PRIMARY KEY (`order_id`),
+  KEY `user_id` (`user_id`),
+  KEY `product_id` (`product_id`),
+  KEY `rider_id` (`rider_id`),
+  KEY `seller_id` (`seller_id`),
+  CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `orders_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`Product_id`),
+  CONSTRAINT `orders_ibfk_3` FOREIGN KEY (`rider_id`) REFERENCES `riders` (`Rider_id`),
+  CONSTRAINT `orders_ibfk_4` FOREIGN KEY (`seller_id`) REFERENCES `seller` (`Seller_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `products` */
+
+DROP TABLE IF EXISTS `products`;
+
+CREATE TABLE `products` (
+  `Product_id` int(11) NOT NULL AUTO_INCREMENT,
+  `seller_id` int(11) NOT NULL,
+  `product_name` varchar(255) NOT NULL,
+  `product_description` text NOT NULL,
+  `price` float NOT NULL,
+  `stock_quantity` int(11) NOT NULL,
+  `category` varchar(50) NOT NULL,
+  `image_url` text DEFAULT NULL,
+  `is_archived` enum('No','Yes') DEFAULT 'No',
+  `status` enum('active','inactive','archived') DEFAULT 'active',
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`Product_id`),
+  KEY `seller_id` (`seller_id`),
+  CONSTRAINT `products_ibfk_1` FOREIGN KEY (`seller_id`) REFERENCES `seller` (`Seller_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `reports` */
+
+DROP TABLE IF EXISTS `reports`;
+
+CREATE TABLE `reports` (
+  `report_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `reported_user_id` int(11) NOT NULL,
+  `product_id` int(11) DEFAULT NULL,
+  `report_details` text NOT NULL,
+  `report_date` datetime NOT NULL,
+  `report_status` enum('pending','resolved') DEFAULT NULL,
+  `offense_level` enum('warning','suspension','ban','deleted') DEFAULT NULL,
+  `penalty_duration` int(11) DEFAULT NULL,
+  PRIMARY KEY (`report_id`),
+  KEY `user_id` (`user_id`),
+  KEY `reported_user_id` (`reported_user_id`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `reports_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `reports_ibfk_2` FOREIGN KEY (`reported_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `reports_ibfk_3` FOREIGN KEY (`product_id`) REFERENCES `products` (`Product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `reviews` */
+
+DROP TABLE IF EXISTS `reviews`;
+
+CREATE TABLE `reviews` (
+  `review_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `rating` int(11) DEFAULT NULL CHECK (`rating` between 1 and 5),
+  `comment` text DEFAULT NULL,
+  `review_date` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`review_id`),
+  KEY `user_id` (`user_id`),
+  KEY `product_id` (`product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `riders` */
+
+DROP TABLE IF EXISTS `riders`;
+
+CREATE TABLE `riders` (
+  `Rider_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `Fname` varchar(255) NOT NULL,
+  `Lname` varchar(255) NOT NULL,
+  `Mname` varchar(255) NOT NULL,
+  `PhoneNumber` varchar(255) NOT NULL,
+  `Address` varchar(255) NOT NULL,
+  PRIMARY KEY (`Rider_id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `seller` */
+
+DROP TABLE IF EXISTS `seller`;
+
+CREATE TABLE `seller` (
+  `Seller_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `ShopName` int(11) NOT NULL,
+  PRIMARY KEY (`Seller_id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `sellerapplications` */
+
+DROP TABLE IF EXISTS `sellerapplications`;
+
+CREATE TABLE `sellerapplications` (
+  `application_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `PhoneNumber` varchar(255) NOT NULL COMMENT 'PH Number ONLY',
+  `Address` varchar(255) NOT NULL COMMENT 'PH ONLY',
+  `Product_Category` varchar(255) NOT NULL,
+  `Approval` varchar(255) NOT NULL DEFAULT 'No',
+  PRIMARY KEY (`application_id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `sellerapplications` */
+
+DROP TABLE IF EXISTS `riderapplications`;
+
+CREATE TABLE `riderapplications` (
+  `application_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `PhoneNumber` varchar(255) NOT NULL COMMENT 'PH Number ONLY',
+  `Address` varchar(255) NOT NULL COMMENT 'PH ONLY',
+  `Approval` varchar(255) NOT NULL DEFAULT 'No',
+  PRIMARY KEY (`application_id`),
+  KEY `user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*Table structure for table `users` */
+
+DROP TABLE IF EXISTS `users`;
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `fname` varchar(255) NOT NULL,
+  `lname` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` varchar(255) NOT NULL,
+  `auth_provider` enum('local','google') DEFAULT 'local',
+  `google_id` varchar(255) DEFAULT NULL,
+  `account_status` enum('active','suspended','banned','deleted') DEFAULT 'active',
+  `suspending_until` datetime DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `seller_warnings` (
+  `warning_id` int(11) NOT NULL AUTO_INCREMENT,
+  `seller_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `warning_message` text NOT NULL,
+  `warning_date` datetime DEFAULT current_timestamp(),
+  `is_resolved` enum('No', 'Yes') DEFAULT 'No',
+  PRIMARY KEY (`warning_id`),
+  KEY `seller_id` (`seller_id`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `seller_warnings_ibfk_1` FOREIGN KEY (`seller_id`) REFERENCES `seller` (`Seller_id`),
+  CONSTRAINT `seller_warnings_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`Product_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `commission_rates` (
+  `rate_id` int(11) NOT NULL AUTO_INCREMENT,
+  `rate_type` enum('flat', 'percentage') NOT NULL,
+  `rate_value` float NOT NULL,
+  `is_active` enum('Yes', 'No') DEFAULT 'Yes',
+  `created_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`rate_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
